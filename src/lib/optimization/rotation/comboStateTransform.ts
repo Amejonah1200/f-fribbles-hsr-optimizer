@@ -13,6 +13,7 @@ import type {
 } from 'lib/optimization/combo/comboTypes'
 import { newTransformStateActions } from 'lib/optimization/rotation/actionTransform'
 import { ComboType } from 'lib/optimization/rotation/comboType'
+import { getComboPartitionValue } from 'lib/optimization/rotation/preprocessor/utils/preprocessUtils'
 import {
   DEFAULT_BASIC,
   getAbilityKind,
@@ -78,6 +79,7 @@ export function defineAction(
   } as OptimizerAction
   action.actorId = context.characterId
   action.actorEidolon = context.characterEidolon
+  action.actorEx = context.characterEx
   action.actionIndex = actionIndex
   action.actionType = getAbilityKind(abilityName)
   action.actionName = abilityName
@@ -96,6 +98,7 @@ export function defineAction(
   if (comboState.comboTeammate0) {
     action.teammate0.actorId = comboState.comboTeammate0.metadata.characterId
     action.teammate0.actorEidolon = comboState.comboTeammate0.metadata.characterEidolon
+    action.teammate0.actorEx = comboState.comboTeammate0.metadata.characterEx
     action.teammate0.characterConditionals = transformConditionals(conditionalIndex, comboState.comboTeammate0.characterConditionals)
     action.teammate0.lightConeConditionals = transformConditionals(conditionalIndex, comboState.comboTeammate0.lightConeConditionals)
   }
@@ -103,6 +106,7 @@ export function defineAction(
   if (comboState.comboTeammate1) {
     action.teammate1.actorId = comboState.comboTeammate1.metadata.characterId
     action.teammate1.actorEidolon = comboState.comboTeammate1.metadata.characterEidolon
+    action.teammate1.actorEx = comboState.comboTeammate1.metadata.characterEx
     action.teammate1.characterConditionals = transformConditionals(conditionalIndex, comboState.comboTeammate1.characterConditionals)
     action.teammate1.lightConeConditionals = transformConditionals(conditionalIndex, comboState.comboTeammate1.lightConeConditionals)
   }
@@ -110,6 +114,7 @@ export function defineAction(
   if (comboState.comboTeammate2) {
     action.teammate2.actorId = comboState.comboTeammate2.metadata.characterId
     action.teammate2.actorEidolon = comboState.comboTeammate2.metadata.characterEidolon
+    action.teammate2.actorEx = comboState.comboTeammate2.metadata.characterEx
     action.teammate2.characterConditionals = transformConditionals(conditionalIndex, comboState.comboTeammate2.characterConditionals)
     action.teammate2.lightConeConditionals = transformConditionals(conditionalIndex, comboState.comboTeammate2.lightConeConditionals)
   }
@@ -137,6 +142,7 @@ export function precomputeConditionals(action: OptimizerAction, comboState: Comb
     const teammateAction = {
       actorId: teammate.metadata.characterId,
       actorEidolon: teammate.metadata.characterEidolon,
+      actorEx: teammate.metadata.characterEx,
       characterConditionals: transformConditionals(action.conditionalIndex, teammate.characterConditionals),
       lightConeConditionals: transformConditionals(action.conditionalIndex, teammate.lightConeConditionals),
       config: action.config,
@@ -175,6 +181,7 @@ function precomputeTeammates(action: OptimizerAction, comboState: ComboState, co
     const teammateAction = {
       actorId: teammate.metadata.characterId,
       actorEidolon: teammate.metadata.characterEidolon,
+      actorEx: teammate.metadata.characterEx,
       characterConditionals: transformConditionals(action.conditionalIndex, teammate.characterConditionals),
       lightConeConditionals: transformConditionals(action.conditionalIndex, teammate.lightConeConditionals),
       config: action.config,
@@ -241,15 +248,7 @@ function transformConditional(category: ComboConditionalCategory, actionIndex: n
     return booleanCategory.activations[actionIndex] ?? false
   }
 
-  const partitionCategory = category as ComboSelectConditional
-  for (let i = 0; i < partitionCategory.partitions.length; i++) {
-    const partition = partitionCategory.partitions[i]
-    if (partition.activations[actionIndex]) {
-      return partition.value
-    }
-  }
-
-  return partitionCategory.partitions[0]?.value ?? 0
+  return getComboPartitionValue(category as ComboSelectConditional, actionIndex)
 }
 
 function transformSetConditionals(actionIndex: number, conditionals: ComboConditionals): SetConditional {

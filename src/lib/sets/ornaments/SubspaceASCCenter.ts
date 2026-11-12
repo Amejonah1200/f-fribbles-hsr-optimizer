@@ -13,6 +13,7 @@ import {
 } from 'lib/gpu/conditionals/dynamicConditionals'
 import { basicP2 } from 'lib/gpu/injection/generateBasicSetEffects'
 import { containerActionVal } from 'lib/gpu/injection/injectUtils'
+import { wgslFalse } from 'lib/gpu/injection/wgslUtils'
 import {
   type BasicStatsArray,
   WgslStatName,
@@ -60,10 +61,13 @@ const SubspaceASCCenterConditional: DynamicConditional = {
   dependsOn: [Stats.SPD],
   chainsTo: [Stats.BE],
   condition: function(x: ComputedStatsContainer, action: OptimizerAction, context: OptimizerContext) {
-    return ornament2p(SetKeys.SubspaceASCCenter, x.c.setMatches) && x.getActionValueByIndex(StatKey.SPD, SELF_ENTITY_INDEX) >= 145
+    // The team BE buff does not stack with a teammate's copy
+    return ornament2p(SetKeys.SubspaceASCCenter, x.c.setMatches)
+      && !x.config.teammateSetEffects[Sets.SubspaceASCCenter]
+      && x.getActionValueByIndex(StatKey.SPD, SELF_ENTITY_INDEX) >= 145
   },
   effect: (x: ComputedStatsContainer, action: OptimizerAction, context: OptimizerContext) => {
-    x.buffDynamic(StatKey.BE, 0.15, action, context, x.targets(TargetTag.FullTeam).source(Source.SubspaceASCCenter))
+    x.buffDynamic(StatKey.BE, 0.18, action, context, x.targets(TargetTag.FullTeam).source(Source.SubspaceASCCenter))
   },
   gpu: function(action: OptimizerAction, context: OptimizerContext) {
     const config = action.config
@@ -75,11 +79,12 @@ const SubspaceASCCenterConditional: DynamicConditional = {
       `
 if (
   ornament2p(*p_sets, SET_SubspaceASCCenter) &&
+  ${wgslFalse(config.teammateSetEffects[Sets.SubspaceASCCenter])} &&
   (*p_state).SubspaceASCCenterConditional${action.actionIdentifier} == 0.0 &&
   ${containerActionVal(SELF_ENTITY_INDEX, StatKey.SPD, config)} >= 145.0
 ) {
   (*p_state).SubspaceASCCenterConditional${action.actionIdentifier} = 1.0;
-  ${buff.action(StatKey.BE, 0.15).targets(TargetTag.FullTeam).wgsl(action)}
+  ${buff.action(StatKey.BE, 0.18).targets(TargetTag.FullTeam).wgsl(action)}
 }
     `,
     )
@@ -100,7 +105,7 @@ const conditionals: SetConditionals = {
     desc: () => i18next.t('BetaMessage', { ns: 'conditionals', Version: CURRENT_DATA_VERSION }),
     nonstackable: true,
     effect: ({ x }) => {
-      x.buff(StatKey.BE, 0.15, x.targets(TargetTag.FullTeam).source(Source.SubspaceASCCenter))
+      x.buff(StatKey.BE, 0.18, x.targets(TargetTag.FullTeam).source(Source.SubspaceASCCenter))
     },
   }],
 }

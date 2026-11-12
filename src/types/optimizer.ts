@@ -11,7 +11,10 @@ import type {
   ComputedStatsContainerConfig,
 } from 'lib/optimization/engine/container/computedStatsContainer'
 import type { AbilityKind } from 'lib/optimization/rotation/turnAbilityConfig'
-import type { CharacterId } from 'types/character'
+import type {
+  CharacterId,
+  ExFlags,
+} from 'types/character'
 import type {
   CharacterConditionalsController,
   ConditionalValueMap,
@@ -43,6 +46,7 @@ export type OptimizerAction = {
 
   actorId: string,
   actorEidolon: number,
+  actorEx: ExFlags,
   actionType: AbilityKind,
   // Ability name
   actionName: string,
@@ -66,6 +70,7 @@ export type OptimizerAction = {
 export type TeammateAction = {
   actorId: string,
   actorEidolon: number,
+  actorEx: ExFlags,
   characterConditionals: ConditionalValueMap,
   lightConeConditionals: ConditionalValueMap,
 }
@@ -90,6 +95,7 @@ export type CharacterStatsBreakdown = {
 export type BasicForm = {
   characterId: CharacterId,
   characterEidolon: number,
+  characterEx: ExFlags,
   lightCone: LightConeId,
   lightConeSuperimposition: number,
 }
@@ -97,11 +103,13 @@ export type BasicForm = {
 export type CharacterMetadata = {
   characterId: CharacterId,
   characterEidolon: number,
+  characterEx: ExFlags,
   lightCone: string,
   lightConeSuperimposition: number,
   lightConePath: PathName,
   path: PathName,
   element: ElementName,
+  baseEnergy: number,
 }
 
 export type ShaderVariables = {
@@ -150,7 +158,6 @@ export type OptimizerContext = CharacterMetadata & {
   baseATK: number,
   baseDEF: number,
   baseSPD: number,
-  baseEnergy: number,
 
   // Enemy data
   enemyLevel: number,

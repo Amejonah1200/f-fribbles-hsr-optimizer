@@ -20,7 +20,10 @@ import type {
   SetsOrnaments,
   SetsRelics,
 } from 'lib/sets/setConfigRegistry'
-import type { CharacterId } from 'types/character'
+import type {
+  CharacterId,
+  ExFlags,
+} from 'types/character'
 import type { LightConeId } from 'types/lightCone'
 
 export enum ScoringConfigType {
@@ -66,7 +69,7 @@ export type ScoringMetadata = {
   /*   support score     */ supportSimulation?: SimulationMetadata,
   /*     heal score      */ healSimulation?: SimulationMetadata,
   /*    shield score     */ shieldSimulation?: SimulationMetadata,
-  /*    leaderboard     */ eidolonImage?: number,
+  /*    leaderboard     */ eidolonImage?: number, // 3 | 4 | 6
 }
 
 export type ScoringParts = Exclude<Parts, typeof Parts.Head | typeof Parts.Hands>
@@ -101,6 +104,7 @@ export type SimulationMetadata = {
     characterId: CharacterId,
     lightCone: LightConeId,
     characterEidolon: number,
+    characterEx?: ExFlags,
     lightConeSuperimposition: number,
     teamRelicSet?: string,
     teamOrnamentSet?: string,
@@ -117,6 +121,7 @@ export type SimulationMetadata = {
 
 export type LeaderboardTeammate = {
   characterId: CharacterId,
+  characterEx?: ExFlags,
   lightCones: LightConeId[],
   teamRelicSet?: string,
   teamOrnamentSet?: string,

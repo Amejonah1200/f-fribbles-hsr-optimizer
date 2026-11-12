@@ -380,7 +380,7 @@ if (
 }
 
 const simulation = (): SimulationMetadata => ({
-  leaderboardEnabled: false,
+  leaderboardEnabled: true,
   parts: {
     [Parts.Body]: [
       Stats.CR,
@@ -429,6 +429,7 @@ const simulation = (): SimulationMetadata => ({
     ...SPREAD_RELICS_4P_GENERAL_CONDITIONALS,
   ],
   ornamentSets: [
+    Sets.PunklordeStageZero,
     Sets.GodsMomentOfJoy,
     ...SPREAD_ORNAMENTS_2P_GENERAL_CONDITIONALS,
     ...SPREAD_ORNAMENTS_2P_SUPPORT,
@@ -486,6 +487,7 @@ const scoring = (): ScoringMetadata => ({
   sortOption: SortOption.ELATION_SKILL,
   hiddenColumns: [SortOption.FUA, SortOption.DOT],
   simulation: simulation(),
+  eidolonImage: 6,
 })
 
 const display = {
@@ -501,8 +503,8 @@ const display = {
   },
   showcaseColor: '#b9b3ff',
   showcaseScoringOrder: [
-    ScoringType.SUBSTAT_SCORE,
     ScoringType.DPS_SCORE,
+    ScoringType.SUBSTAT_SCORE,
     ScoringType.NONE,
   ],
 }
